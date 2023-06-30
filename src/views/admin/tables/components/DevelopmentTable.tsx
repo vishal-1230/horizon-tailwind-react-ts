@@ -14,19 +14,42 @@ import {
   SortingState,
   useReactTable,
 } from "@tanstack/react-table";
+import { FaExternalLinkSquareAlt } from "react-icons/fa";
+import { FcExternal } from "react-icons/fc";
+import { HiExternalLink } from "react-icons/hi";
+import { MdOpenInBrowser } from "react-icons/md";
+import Checkbox from "components/checkbox";
 
 type RowObj = {
+  profile_image: string;
   name: string;
-  tech: any;
+  username: string;
+  phone: any;
+  email: string;
+  images: string[];
   date: string;
+  location: string;
   progress: number;
+  approved?: boolean;
 };
 
-function CheckTable(props: { tableData: any }) {
+function CheckTable(props: { tableData: any, title?:string }) {
   const { tableData } = props;
+  console.log("TABLE DATA", tableData)
   const [sorting, setSorting] = React.useState<SortingState>([]);
   let defaultData = tableData;
   const columns = [
+    columnHelper.accessor("profile_image", {
+      id: "profileImage",
+      header: () => (
+        <p className="text-sm font-bold text-gray-600 dark:text-white">
+          P. IMAGE
+        </p>
+      ),
+      cell: (info) => (
+        <img src={`http://localhost:8000/get-image/${info.getValue()}`} alt="" className="rounded-full w-10 h-10 object-cover" />
+      ),
+    }),
     columnHelper.accessor("name", {
       id: "name",
       header: () => (
@@ -38,63 +61,58 @@ function CheckTable(props: { tableData: any }) {
         </p>
       ),
     }),
-    columnHelper.accessor("tech", {
-      id: "tech",
+    columnHelper.accessor("email", {
+      id: "email",
       header: () => (
-        <p className="text-sm font-bold text-gray-600 dark:text-white">TECH</p>
-      ),
-      cell: (info: any) => (
-        <div className="flex items-center gap-2">
-          {info.getValue().map((item: string, key: number) => {
-            if (item === "apple") {
-              return (
-                <div
-                  key={key}
-                  className="text-[22px] text-gray-600 dark:text-white"
-                >
-                  <DiApple />
-                </div>
-              );
-            } else if (item === "android") {
-              return (
-                <div
-                  key={key}
-                  className="text-[21px] text-gray-600 dark:text-white"
-                >
-                  <DiAndroid />
-                </div>
-              );
-            } else if (item === "windows") {
-              return (
-                <div
-                  key={key}
-                  className="text-xl text-gray-600 dark:text-white"
-                >
-                  <DiWindows />
-                </div>
-              );
-            } else return null;
-          })}
-        </div>
-      ),
-    }),
-    columnHelper.accessor("progress", {
-      id: "progress",
-      header: () => (
-        <p className="text-sm font-bold text-gray-600 dark:text-white">
-          PROGRESS
-        </p>
+        <p className="text-sm font-bold text-gray-600 dark:text-white">EMAIL</p>
       ),
       cell: (info) => (
         <p className="text-sm font-bold text-navy-700 dark:text-white">
           {info.getValue()}
+        </p>
+      ),
+    }),
+    columnHelper.accessor("phone", {
+      id: "phone",
+      header: () => (
+        <p className="text-sm font-bold text-gray-600 dark:text-white">PHONE</p>
+      ),
+      cell: (info) => (
+        <p className="text-sm font-bold text-navy-700 dark:text-white">
+          {info.getValue()}
+        </p>
+      ),
+    }),
+    columnHelper.accessor("location", {
+      id: "location",
+      header: () => (
+        <p className="text-sm font-bold text-gray-600 dark:text-white">LOCATION</p>
+      ),
+      cell: (info: any) => (
+        <div className="flex items-center">
+          <p className="text-sm font-bold text-navy-700 dark:text-white">
+            {info.getValue()}
+          </p>
+        </div>
+      ),
+    }),
+    columnHelper.accessor("images", {
+      id: "images",
+      header: () => (
+        <p className="text-sm font-bold text-gray-600 dark:text-white">
+          IMAGES
+        </p>
+      ),
+      cell: (info) => (
+        <p className="text-sm font-bold text-navy-400 dark:text-white flex items-center gap-1.5 cursor-pointer">
+          View Images <MdOpenInBrowser className="inline-block text-lg" />
         </p>
       ),
     }),
     columnHelper.accessor("date", {
       id: "date",
       header: () => (
-        <p className="text-sm font-bold text-gray-600 dark:text-white">DATE</p>
+        <p className="text-sm font-bold text-gray-600 dark:text-white">DATE APPLIED</p>
       ),
       cell: (info) => (
         <p className="text-sm font-bold text-navy-700 dark:text-white">
@@ -102,24 +120,47 @@ function CheckTable(props: { tableData: any }) {
         </p>
       ),
     }),
-    columnHelper.accessor("progress", {
+    columnHelper.accessor("username", {
+      id: "username",
+      header: () => (
+        <p className="text-sm font-bold text-gray-600 dark:text-white">USERNAME</p>
+      ),
+      cell: (info) => (
+        <p className="text-sm font-bold text-navy-700 dark:text-white">
+          {info.getValue()}
+        </p>
+      ),
+    }),
+    columnHelper.accessor("location", {
+      id: "location",
+      header: () => (
+        <p className="text-sm font-bold text-gray-600 dark:text-white">LOCATION</p>
+      ),
+      cell: (info) => (
+        <p className="text-sm font-bold text-navy-700 dark:text-white">
+          {info.getValue()}
+        </p>
+      ),
+    }),
+    columnHelper.accessor("approved", {
       id: "quantity",
       header: () => (
         <p className="text-sm font-bold text-gray-600 dark:text-white">
-          QUANTITY
+          APPROVE?
         </p>
       ),
       cell: (info) => (
-        <div className="flex items-center gap-3">
-          <p className="text-sm font-bold text-navy-700 dark:text-white">
-            {info.getValue()}%
-          </p>
-          <Progress width="w-[68px]" value={info.getValue()} />
-        </div>
+        <Checkbox
+          defaultChecked={info.getValue()}
+          colorScheme="brandScheme"
+          me="10px"
+          color="red"
+        />
       ),
     }),
   ]; // eslint-disable-next-line
-  const [data, setData] = React.useState(() => [...defaultData]);
+  // const [data, setData] = React.useState(() => [...defaultData]);
+  const data = defaultData;
   const table = useReactTable({
     data,
     columns,
@@ -135,13 +176,13 @@ function CheckTable(props: { tableData: any }) {
     <Card extra={"w-full h-full sm:overflow-auto px-6"}>
       <header className="relative flex items-center justify-between pt-4">
         <div className="text-xl font-bold text-navy-700 dark:text-white">
-          Check Table
+          {props.title ? props.title : "Check Table"}
         </div>
 
         <CardMenu />
       </header>
 
-      <div className="mt-8 overflow-x-scroll xl:overflow-x-hidden">
+      <div className="mt-8 overflow-x-scroll">
         <table className="w-full">
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
